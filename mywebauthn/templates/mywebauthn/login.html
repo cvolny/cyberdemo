@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block style %}
+{{ block.super }}<link href="{% static '/css/floating-labels.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+{{ block.super }}<script type="text/javascript" src="{% static 'js/cbor.js' %}"></script>
+{% endblock %}
+   
+{% block title_page %}Authentication{% endblock %}
+
+{% block content %}
+<div class="container d-flex h-100 py-5">
+  <div class="card">
+    <div class="card-body">
+      <h1 class="card-title h3 mt-1">Authentication</h1>
+      <form id="login-form" class="form-signin w-100 row" disabled>
+        <div id="container-field-username" class="form-label-group w-100">
+          <input type="text" id="username-field" name="username" class="form-control" placeholder="username/token" required autofocus>
+          <label for="username-field">Username/Token</label>
+        </div>
+
+        <button id="login-button" class="btn btn-lg btn-primary btn-block">Login</button>
+        <button id="register-button" class="btn btn-lg btn-secondary btn-block">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block jsready %}
+
+function putMessage(cls, msg) {
+  $('#messages').append(`<div class="alert alert-${cls}" role="alert">${msg}</div>`);
+}
+
+function putError(msg) {
+  return putMessage('error', msg);
+}
+
+function build_init_context() {
+  var user = $( "#username-field" ).val();
+  var fd = new FormData();
+  fd.append("username", user);
+  var data = {
+    method: 'POST',
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+      "X-CSRFToken":      "{{ csrf_token }}",
+    },
+    body: fd,
+  };
+  console.log('build_init_context()', data, user);
+  return data;
+}
+
+function build_login_context(assertion) {
+  var data = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/cbor",
+    },
+    body: CBOR.encode({
+      "credentialId":      new Uint8Array(assertion.rawId),
+      "authenticatorData": new Uint8Array(assertion.response.authenticatorData),
+      "clientDataJSON":    new Uint8Array(assertion.response.clientDataJSON),
+      "signature":         new Uint8Array(assertion.response.signature),
+    }),
+  };
+  console.log('build_login_context()', data, assertion);
+  return data;
+}
+
+function build_register_context(attestation) {
+  var data = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/cbor",
+    },
+    body: CBOR.encode({
+      "attestationObject": new Uint8Array(attestation.response.attestationObject),
+      "clientDataJSON":    new Uint8Array(attestation.response.clientDataJSON),
+      
+    }),
+  };
+  console.log('build_register_context()', data, attestation);
+  return data;
+}
+
+function webauthn(starturl, starterror, authurl, autherror, credentials_callback, cred_context_callback) {
+  fetch(starturl, build_init_context())
+    .then((res) => {
+      if (res.ok) {
+        return res.arrayBuffer();
+      }
+      console.log(`Failed response from ${starturl}:`, res);
+      window.location.reload();
+    }).then(CBOR.decode)
+    .then((ops) => {
+      console.log("Decoded ops for credentials callback:", ops);
+      return credentials_callback(ops);
+    }).then(function(assertion) {
+      fetch(authurl, cred_context_callback(assertion))
+        .then((res) => {
+          if (res.ok) {
+            return res.text()
+              .then((txt) => window.location.href = txt);
+          }
+          console.log(`Failed response from ${authurl}:`, res);
+          window.location.reload();
+        });
+    });
+}
+
+function login() {
+  return webauthn("{% url 'fido2_login_begin' %}", "Cannot authenticate as user.",
+                  "{% url 'fido2_login_complete' %}", "Login failed with specified key.",
+                    (ops) => navigator.credentials.get(ops), build_login_context);
+}
+
+function register() {
+  return webauthn("{% url 'fido2_register_begin' %}", "Cannot perform webauthn registration.",
+                  "{% url 'fido2_register_complete' %}", "Registration step failed. Try again.",
+                    (ops) => navigator.credentials.create(ops), build_register_context);
+}
+
+function ishttps() {
+  return (window.location.protocol == "https:");
+}
+
+if (ishttps()) {
+  $( "#login-form" )
+    .prop("disabled", false)
+    .submit(function(evt) {
+      evt.stopPropagation();
+      return false;
+    });
+  $( "#login-button" )
+    .click(() => login());
+  $( "#register-button" )
+    .click(() => register());
+} else {
+  putMessage('error', 'FIDO2 only works under secure, https, context.');
+}
+{% endblock %}

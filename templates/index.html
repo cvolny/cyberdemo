@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title_page %}Homepage{% endblock %}
+
+{% block content %}
+<div class="my-3">
+	<h1 class="mt-0">Welcome Page</h1>
+	<p>This is a landing page for the Fall 2020 Cybersecurity webauthn demo application.</p>
+	<h2>Progress Log</h2>
+	<dl>
+	    <dt>2020-12-04</dt>
+	    <dd>Project and Report Due Date</dd>
+	    <dt>2020-12-02</dt>
+	    <dd>Final polishing. Disable references and functionality of passwords in django-admin.</dd>
+	    <dt>2020-11 (rest of the month)</dt>
+	    <dd>Replcing django-mfa2 with custom fido2.py to django integration.</dd>
+	    <dt>2020-11-09</dt>
+	    <dd>Presentation day!</dd>
+	    <dt>2020-11-08</dt>
+	    <dd>Add samples and links to demo website</dd>
+	</dl>
+	<h2>Project Homepage</h2>
+	<p><a href="https://github.com/cvolny/cyberdemo/">cyberdemo on github</a></p>
+	<h2>Code Highlights</h2>
+	<div class="accordian" id="code-samples">
+	    <div class="card">
+	        <div class="card-header bg-white" id="card-login-view">
+	            <h3>
+	                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-models">
+	                    Model Relationships
+                    </button>
+                </h3>
+	        </div>
+	        <div id="collapse-models" class="collapse p-5" data-parent="#code-samples">
+            	<img class="w-100" src="{% static 'img/models.png' %}" />
+	        </div>
+        </div>
+	    <div class="card">
+	        <div class="card-header bg-white" id="card-create-view">
+	            <h3>
+	                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-create-view">
+	                    Create User
+                    </button>
+                </h3>
+	        </div>
+	        <div id="collapse-create-view" class="collapse p-5" data-parent="#code-samples">
+            	<img class="w-100" src="{% static 'img/create_view.png' %}" />
+            	<img class="w-100" src="{% static 'img/create_template.png' %}" />
+	        </div>
+        </div>
+	    <div class="card">
+	        <div class="card-header bg-white" id="card-login-view">
+	            <h3>
+	                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-login-view">
+	                    Login/Registration View
+                    </button>
+                </h3>
+	        </div>
+	        <div id="collapse-login-view" class="collapse p-5" data-parent="#code-samples">
+            	<img class="w-100" src="{% static 'img/register_view.png' %}" />
+            	<img class="w-100" src="{% static 'img/login_view.png' %}" />
+            	<img class="w-100" src="{% static 'img/login_template.png' %}" />
+            	<img class="w-100" src="{% static 'img/login_javascript.png' %}" />
+	        </div>
+        </div>
+	</div>
+</div>
+{% endblock %}

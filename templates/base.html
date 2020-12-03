@@ -1,0 +1,103 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+{% block headtag %}
+  {% block metatags %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {% endblock metatags %}
+  <title>{% block titletag %}{% block title_site %}CyberDemo{% endblock %}{% block title_sep %} :: {% endblock %}{% block title_page %}example{% endblock %}{% endblock %}</title>
+  {% block style %}
+  <link href="{% static '/css/bootstrap.css' %}" rel="stylesheet">
+  <link href="{% static '/css/sticky-footer-navbar.css' %}" rel="stylesheet">
+  <link href="{% static '/css/site.css' %}" rel="stylesheet">
+  {% endblock style %}
+  {% block script %}
+  <script type="text/javascript" src="{% static '/js/jquery.js' %}"></script>
+  <script type="text/javascript" src="{% static '/js/bootstrap.js' %}"></script>
+  {% endblock script %}
+  {% block head %}
+  {% endblock %}
+{% endblock headtag %}
+</head>
+<body class="d-flex flex-column h-100">
+{% block bodytag %}
+<header>
+{% block headertag %}
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    {% block navtag %}
+    <a class="navbar-brand" href="{% url 'index' %}">Cyber Webauthn Demo</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'index' %}">Home</a>
+        </li>
+    {% if request.user.is_staff %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'create_user' %}">Create User</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+        </li>
+    {% endif %}
+      </ul>
+      <span class="navbar-text py-0">
+        {% if request.user.is_authenticated %}
+        <span class="mr-2">{{ request.user.username }}</span>
+        <a class="" href="{% url 'logout' %}">Logout</a>
+        {% else %}
+        <a class="" href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </span>
+    </div>
+    {% endblock navtag %}
+  </nav>
+{% endblock headertag %}
+</header>
+
+<main role="main" class="flex-shrink-0 mt-5">
+  {% block maintag %}
+  <div id="messages" class="mx-2">
+  {% block messages %}
+    {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      {{ message }}
+    </div>
+    {% endfor %}
+  {% endblock messages %}
+  </div>
+  <div class="container">
+    {% block content %}
+    Hello, World!
+    {% endblock content %}
+  </div>
+  {% endblock maintag %}
+</main>
+
+<footer class="footer mt-auto w-100">
+{% block footertag %}
+<div class="container w-100">
+  {% block footer %}
+  <span class="text-muted float-right">utoledo.edu 2020:4 EECS5720:022 cvolny</span>
+  {% endblock footer %}
+</div>
+{% endblock footertag %}
+</footer>
+{% block script_page %}
+<script type="text/javascript">
+$(function() {
+  {% block jsready %}
+  {% endblock %}
+});
+</script>
+{% endblock script_page %}
+{% endblock bodytag %}
+</body>
+</html>

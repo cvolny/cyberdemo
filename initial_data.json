@@ -1,0 +1,24 @@
+[
+{
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "username": "chris",
+        "email": "chris@nowhere.com",
+        "password": "!notgonnahappen",
+        "is_superuser": true,
+        "is_staff": true,
+        "is_active": true
+    }
+},
+{
+    "model": "mywebauthn.token",
+    "pk": "aea2qc-375ca078c6f4668ad786450c6d82af12",
+    "fields": {
+        "user": 1,
+        "created": "2020-12-03T00:01:24.433Z",
+        "expires": "2030-12-03T10:10:01.160Z",
+        "redeemed": null
+    }
+}
+]
