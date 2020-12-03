@@ -78,7 +78,6 @@ def fido2_register_begin(req):
             logger.error(f'Token "{token}" lookup and redemtion failed: {e}')
     if user:
         logger.debug(f'User "{user}" redeemed token "{token}".')
-        auth.login(req, user)
         data, state = SERVER.register_begin(
             user=get_user_dict(user),
             credentials=get_fido2_credentials(user),
